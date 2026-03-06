@@ -1,29 +1,46 @@
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
+from unicodedata import category
 
-class SearchResultsPage:
-    def __init__(self, driver):
-        self.driver = driver
-        # Locators for search results page elements
-        self.results_container = (By.CSS_SELECTOR, "div[data-testid='search-results']")
-        self.first_product_title = (By.CSS_SELECTOR, "h2[data-testid='product-title']")  # Assuming this locator for product titles
-        self.no_results_message = (By.CSS_SELECTOR, "div[data-testid='no-results-message']")
 
-    def check_results_container(self):
-        wait = WebDriverWait(self.driver, 10)
-        results_element = wait.until(EC.visibility_of_element_located(self.results_container))
-        assert results_element.is_displayed(), "Search results container is not displayed."
+class search_results_page:
+    def __init__(self,page):
+        self.page = page
 
-    def check_first_product_title(self):
-        wait = WebDriverWait(self.driver, 10)
-        title_element = wait.until(EC.visibility_of_element_located(self.first_product_title))
-        assert title_element.is_displayed(), "First product title is not displayed."
+    def search_for_item(self,item: str):
+        search_menu = self.page.locator("[id-'gn-search-input']")
+        search_menu.click()
+        search_menu.fill('item')
+        search_menu.prees('Enter')
 
-    def check_no_results_message(self):
-        try:
-            wait = WebDriverWait(self.driver, 10)
-            no_results_element = wait.until(EC.visibility_of_element_located(self.no_results_message))
-            assert no_results_element.is_displayed(), "No results message is not displayed."
-        except:
-            print("No results message not found, which is expected if there are results.")
+    def check_football_category(self,item: str):
+        categories = self.page.locator("text=Football")
+        count = categories.count()
+        if count > 0:
+           print("Football category exists")
+           return True
+        else:
+           print("Football category NOT found")
+           return False
+
+    def check_products_have_info(self):
+        print("checking that every product has information")
+
+        self.page.wait_for_selector("[data-testid='product-card']")
+
+        products = self.page.locator("[data-testid='product-card']")
+        count = products.count()
+
+        print(f"Found {count} products")
+
+        for i in range(count):
+            product = products.nth(i)
+
+            title = product.locator("a").inner_text()
+            price = product.locator("[data-testid='product-price']").inner_text()
+            image = product.locator("img").get_attribute("src")
+
+            print(f"Product {i + 1}: {title} | {price}")
+
+            assert title != "", "Product title missing"
+            assert price != "", "Product price missing"
+            assert image is not None, "Product image missing"
+
