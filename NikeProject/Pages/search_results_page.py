@@ -39,3 +39,5 @@ class search_results_page:
             print(f"Product {i + 1}: {title} | {price}")
 
 
+
+
