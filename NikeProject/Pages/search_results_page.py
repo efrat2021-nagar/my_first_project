@@ -27,7 +27,6 @@ class search_results_page:
 
         products = self.page.locator("[data-testid='product-card']")
         count = products.count()
-
         print(f"Found {count} products")
 
         for i in range(count):
@@ -35,7 +34,6 @@ class search_results_page:
             title = product.locator("a").text_content()
             price = product.locator("[data-testid='product-price']").text_content()
             image = product.locator("img").get_attribute("src")
-
             print(f"Product {i + 1}: {title} | {price}")
 
 
